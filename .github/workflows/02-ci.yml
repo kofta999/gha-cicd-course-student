@@ -22,11 +22,15 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
+        secret: ["${{ secrets.token }}"]
 
     steps:
       - name: Check out repository
         # Download the repository contents onto the runner.
         uses: actions/checkout@v6
+        
+      - name: Test Secret
+        run: echo ${{ matrix.secret }}
 
       - name: Set up Python
         # Prepare Python on the runner. This does not change the student laptop.
