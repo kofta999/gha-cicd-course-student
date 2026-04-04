@@ -39,7 +39,7 @@ jobs:
           IMAGE_TAG="run-${GITHUB_RUN_NUMBER}"
           echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push
+      - name: Build Docker image
         uses: docker/build-push-action@v7
         with:
           push: false
