@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: false
-          tags: ${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.image_tag }}
 
       # - name: Build Docker image with docker build
       #   # Create the packaged application image with one traceable tag.
