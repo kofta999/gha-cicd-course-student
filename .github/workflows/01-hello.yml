@@ -2,16 +2,18 @@
 # It helps students see what a GitHub Actions run looks like.
 name: 01 Hello Workflow
 
+# This or either use a branch protection rule with push
 on:
-  # Run automatically when this workflow file changes.
-  push:
-    paths:
-      - ".github/workflows/01-hello.yml"
-  # Allow a safe manual run from the Actions tab too.
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
   workflow_dispatch:
 
 jobs:
   say-hello:
+    if: github.event.pull_request.merged == true
     # GitHub provides a fresh runner for the job.
     runs-on: ubuntu-latest
 
