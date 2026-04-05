@@ -49,8 +49,8 @@ jobs:
       run: |
         docker run -d \
           --name ${{ env.CONTAINER_NAME }} \
-          -p 8000:8000 \
-          "tiny-health-app:run-${{ github.event.workflow_run.run_number }}"
+          -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
+          "${{ steps.image-tag.outputs.image_tag }}"
 
     - name: Smoke test deployed app
       # Retry a few times because app startup can take a moment.
