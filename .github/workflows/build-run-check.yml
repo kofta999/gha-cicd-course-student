@@ -50,7 +50,7 @@ jobs:
         docker run -d \
           --name ${{ env.CONTAINER_NAME }} \
           -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
-          "${{ steps.image-tag.outputs.image_tag }}"
+          ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.image_tag }}"
 
     - name: Smoke test deployed app
       # Retry a few times because app startup can take a moment.
