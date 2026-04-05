@@ -1,0 +1,71 @@
+name: Build, run and check code
+
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: tiny-health-app
+  CONTAINER_NAME: tiny-health-app-container
+  PYTHON_VERSION: 3.12
+  BASE_IMAGE: python:3.12-slim
+  APP_PORT: 8000
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      # Get the repository files onto the runner.
+      uses: actions/checkout@v6
+
+    - name: Set up Python
+      # Prepare Python so the workflow can run the tests first.
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Run tests
+      # Build only after the verification step passes.
+      run: python -m unittest discover -s tests -v
+
+    - name: Set image tag
+      # Create one simple tag so the image is easy to identify in this run.
+      id: image-tag
+      run: |
+        IMAGE_TAG="run-${GITHUB_RUN_NUMBER}"
+        echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v7
+      with:
+        push: false
+        tags: ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.image_tag }}
+        file: Dockerfile.test
+        build-args: IMAGE_NAME=${{ env.IMAGE_NAME }}
+
+    - name: Start container
+      # Start the exact same tagged image that the build workflow created.
+      run: |
+        docker run -d \
+          --name ${{ env.CONTAINER_NAME }} \
+          -p 8000:8000 \
+          "tiny-health-app:run-${{ github.event.workflow_run.run_number }}"
+
+    - name: Smoke test deployed app
+      # Retry a few times because app startup can take a moment.
+      run: |
+        for attempt in 1 2 3 4 5; do
+          if curl --fail --silent http://127.0.0.1:8000/health; then
+            exit 0
+          fi
+          echo "Waiting for app to become ready..."
+          sleep 2
+        done
+        echo "App did not become ready in time."
+        exit 1
+
+    - name: Stop container
+      if: always()
+      # Clean up even if an earlier step fails.
+      run: docker rm -f tiny-health-container || true

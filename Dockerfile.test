@@ -1,0 +1,10 @@
+ARG IMAGE_NAME
+FROM ${IMAGE_NAME}
+
+WORKDIR /app
+
+COPY app ./app
+
+EXPOSE 8000
+
+CMD ["python", "app/app.py"]

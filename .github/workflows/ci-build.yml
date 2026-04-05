@@ -80,14 +80,6 @@ jobs:
         push: false
         tags: ${{ env.IMAGE_NAME }}:${{ steps.image-tag.outputs.image_tag }}
 
-    # - name: Build Docker image with docker build
-    #   # Create the packaged application image with one traceable tag.
-    #   # The deploy workflow will run this exact same tag later.
-    #   run: |
-    #     docker build \
-    #       -t "${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}" \
-    #       .
-
     - name: Save Docker image as artifact file
       # Convert that exact tagged image into a file that can be reused later.
       run: docker save "${IMAGE_NAME}:${{ steps.image-tag.outputs.image_tag }}" -o "${IMAGE_TAR}"
